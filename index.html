@@ -1,0 +1,864 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ANNA STARNESS — «Безупречная любовь» | Слушать на стримингах</title>
+  <meta name="description" content="Anna Starness — сингл «Безупречная любовь». Слушай на Яндекс Музыке, VK Музыке, Spotify и Apple Music." />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Шрифты: Expressive Serif + Technical Monospace + Clean Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paper: '#F2EFE9',
+            paperDark: '#E5E0D5',
+            ink: '#141414',
+            inkMuted: '#57534E',
+            nerve: '#FF4500',
+            nerveHover: '#E03D00',
+          },
+          fontFamily: {
+            editorial: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Inter"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Базовые настройки и тактильная бумажная текстура */
+    :root {
+      --bg-color: #F2EFE9;
+      --text-color: #141414;
+      --accent-color: #FF4500;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      transition: background-color 0.45s cubic-bezier(0.22, 1, 0.36, 1), color 0.45s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Режим "Студия / Драйв" — инверсия в глубокий виниловый графит */
+    body.studio-mode {
+      --bg-color: #141414;
+      --text-color: #F2EFE9;
+    }
+
+    /* Тонкий пленочный шум поверх экрана для эффекта аналогового издания */
+    .grain-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 50;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Кастомный ползунок кроссфейдера микшерного пульта */
+    input[type="range"].crossfader {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    input[type="range"].crossfader::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #A8A29E 0%, #FF4500 100%);
+    }
+
+    input[type="range"].crossfader::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #FF4500;
+      border: 2px solid #141414;
+      margin-top: -11px;
+      box-shadow: 0 4px 12px rgba(255, 69, 0, 0.45);
+      transition: transform 0.15s ease;
+    }
+
+    input[type="range"].crossfader::-webkit-slider-thumb:active {
+      transform: scale(1.12);
+    }
+
+    /* Анимация эквалайзера */
+    @keyframes eqPulse {
+      0%, 100% { transform: scaleY(0.25); }
+      50% { transform: scaleY(1); }
+    }
+
+    .eq-bar {
+      transform-origin: bottom;
+      animation: eqPulse 0.8s ease-in-out infinite;
+    }
+
+    .eq-paused .eq-bar {
+      animation-play-state: paused;
+      transform: scaleY(0.2);
+    }
+
+    /* Перфорация билета / релиза */
+    .ticket-divider {
+      background-image: linear-gradient(to right, currentColor 40%, rgba(255,255,255,0) 0%);
+      background-position: bottom;
+      background-size: 10px 1px;
+      background-repeat: repeat-x;
+      opacity: 0.25;
+    }
+
+    /* Плавный скролл */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-nerve selection:text-white">
+
+  <!-- Текстура бумаги/пленки -->
+  <div class="grain-overlay"></div>
+
+  <!-- Всплывающее уведомление (Toast) вместо alert() -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 translate-y-4 transition-all duration-300 w-[90%] max-w-sm">
+    <div class="bg-ink text-paper border border-nerve/60 px-4 py-3 rounded-xl shadow-2xl flex items-center justify-between gap-3">
+      <span id="toast-text" class="font-mono text-xs tracking-tight">Ссылка скопирована</span>
+      <span class="w-2 h-2 rounded-full bg-nerve shrink-0"></span>
+    </div>
+  </div>
+
+  <!-- Основной мобильный контейнер (адаптируется под десктоп как журнальный разворот) -->
+  <main class="max-w-lg mx-auto px-4 pt-4 pb-16 sm:px-6 sm:pt-8">
+
+    <!-- 1. ВЕРХНЯЯ ТЕХНИЧЕСКАЯ СТРОКА (МАРКИРОВКА КАССЕТЫ) -->
+    <header class="flex items-center justify-between border-b border-current/15 pb-3 mb-5 font-mono text-[11px] uppercase tracking-wider">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-nerve animate-pulse"></span>
+        <span>PTZ // RELEASE 2026</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="mode-badge" class="px-2 py-0.5 rounded bg-current/10 font-bold">АКУСТИКА / ДЕМО</span>
+        <button onclick="toggleEpkModal(true)" class="underline decoration-nerve underline-offset-4 hover:text-nerve transition-colors">
+          EPK / СМИ
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. HERO-СЕКЦИЯ: ИМЯ, ПОРТРЕТ И КРОССФЕЙДЕР САУНДЧЕКА -->
+    <section class="mb-7">
+      <div class="mb-3">
+        <p class="font-mono text-xs uppercase tracking-widest text-nerve mb-1">Новый сингл уже на площадках</p>
+        <h1 class="font-editorial text-5xl sm:text-6xl font-bold leading-[0.92] tracking-tight uppercase">
+          ANNA STARNESS
+        </h1>
+        <div class="flex items-baseline justify-between mt-1.5">
+          <h2 class="font-editorial italic text-2xl sm:text-3xl font-semibold opacity-90">
+            «Безупречная любовь»
+          </h2>
+          <span class="font-mono text-xs opacity-60">ALT / INDIE ROCK</span>
+        </div>
+      </div>
+
+      <!-- Карточка обложки / главного портрета с динамическим фильтром -->
+      <div class="relative rounded-2xl overflow-hidden border border-current/20 shadow-xl aspect-[4/4.4] bg-zinc-950 group">
+        <img 
+          id="hero-photo"
+          src="https://i.postimg.cc/xT086zVH/hero.jpg" 
+          onerror="this.src='https://placehold.co/800x880/141414/f2efe9?text=ANNA+STARNESS'"
+          alt="Anna Starness — Безупречная любовь"
+          class="w-full h-full object-cover object-top grayscale contrast-110 brightness-95 transition-all duration-500 scale-100"
+        />
+
+        <!-- Градиент для читаемости оверлея -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent"></div>
+
+        <!-- Верхний стикер на фото -->
+        <div class="absolute top-3 left-3 right-3 flex justify-between items-start pointer-events-none">
+          <span class="bg-paper/90 text-ink font-mono text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider shadow">
+            SIDE A • SINGLE
+          </span>
+          <span id="live-status-pill" class="bg-black/75 text-white backdrop-blur-md font-mono text-[10px] px-2.5 py-1 rounded-md border border-white/15">
+            RAW VOCAL + NERVE
+          </span>
+        </div>
+
+        <!-- Нижний блок внутри фото: Манифест + Кроссфейдер -->
+        <div class="absolute bottom-0 inset-x-0 p-4 text-paper">
+          <p class="font-editorial italic text-lg sm:text-xl leading-snug mb-3 text-white/95">
+            «Крысы страшно злятся, если корабль, с которого они сбежали, НЕ ТОНЕТ»
+          </p>
+
+          <!-- Интерактивный кроссфейдер (Акустика <-> Студия) -->
+          <div class="bg-black/80 backdrop-blur-md border border-white/15 rounded-xl p-3">
+            <div class="flex justify-between items-center font-mono text-[10px] uppercase tracking-wider mb-1.5">
+              <button type="button" onclick="setCrossfader(0)" class="text-left hover:text-nerve transition-colors font-bold text-white/80">
+                ← 01. Акустика (Нерв)
+              </button>
+              <span class="text-nerve font-bold">САУНДЧЕК</span>
+              <button type="button" onclick="setCrossfader(100)" class="text-right hover:text-nerve transition-colors font-bold text-white">
+                02. Студия (Драйв) →
+              </button>
+            </div>
+            <input 
+              id="sound-crossfader" 
+              type="range" 
+              min="0" 
+              max="100" 
+              value="15" 
+              aria-label="Переключатель звучания: Акустика или Студия"
+              class="crossfader w-full"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. ГЛАВНАЯ КОНВЕРСИЯ: КНОПКИ СТРИМИНГОВ (ПОД БОЛЬШОЙ ПАЛЕЦ) -->
+    <section aria-label="Слушать на стримингах" class="mb-8">
+      <div class="flex items-center justify-between mb-2.5">
+        <span class="font-mono text-xs uppercase tracking-wider font-bold">Слушать «Безупречную любовь»:</span>
+        <button onclick="copySmartLink()" class="font-mono text-xs text-nerve hover:underline flex items-center gap-1 font-medium">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Скопировать ссылку
+        </button>
+      </div>
+
+      <!-- Сетка крупных кнопок под мобильный трафик -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- Яндекс Музыка (Главный акцент с прямой ссылкой на альбом) -->
+        <a href="https://music.yandex.ru/album/44275123" target="_blank" rel="noopener" onclick="trackStreamClick('Яндекс Музыка')"
+           class="col-span-1 sm:col-span-2 flex items-center justify-between bg-nerve hover:bg-nerveHover text-white px-4 py-3.5 rounded-xl font-medium shadow-lg shadow-nerve/25 active:scale-[0.99] transition-all">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-lg bg-black/20 flex items-center justify-center font-mono font-bold text-sm">Я</span>
+            <div>
+              <div class="font-semibold text-base leading-tight">Яндекс Музыка</div>
+              <div class="font-mono text-[10px] opacity-90 uppercase">Открыть сингл + поставить ❤️</div>
+            </div>
+          </div>
+          <span class="font-mono text-xs bg-black/25 px-2.5 py-1 rounded-lg">СЛУШАТЬ →</span>
+        </a>
+
+        <!-- BandLink (Все площадки в одном окне) -->
+        <a href="https://band.link/gho4i" target="_blank" rel="noopener" onclick="trackStreamClick('BandLink')"
+           class="flex items-center justify-between border border-current/20 bg-current/[0.04] hover:border-nerve px-4 py-3.5 rounded-xl active:scale-[0.99] transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-nerve/15 text-nerve flex items-center justify-center font-mono font-bold text-xs">BL</span>
+            <div>
+              <div class="font-semibold text-sm leading-tight">Все площадки</div>
+              <div class="font-mono text-[10px] opacity-60">BandLink</div>
+            </div>
+          </div>
+          <span class="font-mono text-xs opacity-60">↗</span>
+        </a>
+
+        <!-- VK Музыка / Сообщество -->
+        <a href="https://vk.ru/annastarness" target="_blank" rel="noopener" onclick="trackStreamClick('ВКонтакте')"
+           class="flex items-center justify-between border border-current/20 bg-current/[0.04] hover:border-nerve px-4 py-3.5 rounded-xl active:scale-[0.99] transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-[#0077FF]/15 text-[#0077FF] flex items-center justify-center font-mono font-bold text-xs">VK</span>
+            <div>
+              <div class="font-semibold text-sm leading-tight">ВКонтакте</div>
+              <div class="font-mono text-[10px] opacity-60">Треки и посты</div>
+            </div>
+          </div>
+          <span class="font-mono text-xs opacity-60">↗</span>
+        </a>
+
+        <!-- Карточка артиста на Яндекс Музыке (подписка на профиль) -->
+        <a href="https://music.yandex.ru/artist/24263620" target="_blank" rel="noopener" onclick="trackStreamClick('Профиль артиста')"
+           class="sm:col-span-2 flex items-center justify-between border border-current/20 bg-current/[0.04] hover:border-nerve px-4 py-3 rounded-xl active:scale-[0.99] transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="w-7 h-7 rounded-lg bg-current/10 flex items-center justify-center font-mono font-bold text-xs">★</span>
+            <span class="font-semibold text-sm">Карточка артиста Anna Starness</span>
+          </div>
+          <span class="font-mono text-xs opacity-60">Подписаться ↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 4. МЕХАНИКА «30 СЕКУНД, КОТОРЫЕ РЕШАЮТ ВСЁ» (CUE POINTS ПЛЕЕР) -->
+    <section class="mb-8 rounded-2xl border border-current/20 p-4 sm:p-5 bg-current/[0.03]">
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <span class="font-mono text-[10px] uppercase tracking-widest text-nerve block">Интерактивное превью</span>
+          <h3 class="font-editorial text-2xl font-bold">30 секунд, которые решают всё</h3>
+        </div>
+        <!-- Кнопка Play/Pause -->
+        <button 
+          id="main-play-btn" 
+          onclick="toggleAudioPlayback()" 
+          class="w-12 h-12 rounded-full bg-nerve text-white flex items-center justify-center shadow-lg shadow-nerve/30 hover:scale-105 active:scale-95 transition-transform"
+          aria-label="Включить или остановить превью трека"
+        >
+          <svg id="icon-play" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+      </div>
+
+      <!-- Визуальная волна + прогресс -->
+      <div class="mb-4">
+        <div id="waveform-bars" class="eq-paused flex items-end justify-between gap-1 h-10 px-1 py-1.5 rounded-lg bg-current/[0.05]">
+          <!-- Полосы генерируются скриптом -->
+        </div>
+        <div class="flex justify-between font-mono text-[10px] opacity-65 mt-1.5">
+          <span id="current-cue-label">Нажми таймкод или Play</span>
+          <span id="timer-display">00:42 / 03:14</span>
+        </div>
+      </div>
+
+      <!-- 3 быстрые точки входа в трек (Cue Points) -->
+      <div class="space-y-2">
+        <p class="font-mono text-[10px] uppercase opacity-60">Прыгнуть сразу в нужный момент:</p>
+        
+        <button type="button" onclick="jumpToCue(0)" data-cue="0"
+          class="cue-btn w-full text-left flex items-center justify-between p-2.5 rounded-xl border border-current/15 hover:border-nerve transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-current/10">0:00</span>
+            <span class="text-sm font-medium">Вступление / холодный нерв</span>
+          </div>
+          <span class="font-mono text-[10px] uppercase text-nerve">Слушать</span>
+        </button>
+
+        <button type="button" onclick="jumpToCue(1)" data-cue="1"
+          class="cue-btn w-full text-left flex items-center justify-between p-2.5 rounded-xl border border-nerve/60 bg-nerve/[0.07] hover:border-nerve transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-nerve text-white">0:42</span>
+            <span class="text-sm font-semibold">Припев — «Безупречная любовь»</span>
+          </div>
+          <span class="font-mono text-[10px] uppercase text-nerve font-bold">Кульминация ★</span>
+        </button>
+
+        <button type="button" onclick="jumpToCue(2)" data-cue="2"
+          class="cue-btn w-full text-left flex items-center justify-between p-2.5 rounded-xl border border-current/15 hover:border-nerve transition-all">
+          <div class="flex items-center gap-2.5">
+            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-current/10">2:10</span>
+            <span class="text-sm font-medium">Финальный разрыв и барабанный драйв</span>
+          </div>
+          <span class="font-mono text-[10px] uppercase text-nerve">Слушать</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 5. ПРОВОКАЦИОННЫЙ БЛОК «БЕЗУПРЕЧНАЯ ЛЮБОВЬ» / «А Я ПЛОХАЯ» (ФОТО НА ДИВАНЕ) -->
+    <section class="mb-8 rounded-2xl overflow-hidden border border-current/20 bg-current/[0.03]">
+      <div class="relative aspect-[4/4.2] bg-zinc-900">
+        <img 
+          src="https://i.postimg.cc/QxXCfTZ7/couch.jpg" 
+          loading="lazy"
+          onerror="this.src='https://placehold.co/800x840/1c1917/f2efe9?text=ANNA+STARNESS'"
+          alt="Anna Starness — Безупречная любовь (а я плохая)"
+          class="w-full h-full object-cover object-top"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-transparent to-black/20"></div>
+        <div class="absolute top-3 left-3">
+          <span class="bg-nerve text-white font-mono text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">
+            ИЗ ТЕКСТА СИНГЛА
+          </span>
+        </div>
+        <div class="absolute bottom-3 left-4 right-4 text-white">
+          <p class="font-editorial italic text-xl sm:text-2xl leading-snug">
+            «Хорошая хозяйка никогда не выкинет пса на улицу, а ты? А я плохая...»
+          </p>
+        </div>
+      </div>
+      <div class="p-4 flex items-center justify-between gap-3">
+        <p class="text-xs leading-relaxed opacity-85">
+          Честный трек без удобных масок. Добавь к себе частичку этого нерва на своей площадке.
+        </p>
+        <a href="https://music.yandex.ru/album/44275123" target="_blank" rel="noopener" 
+           class="shrink-0 font-mono text-xs bg-nerve text-white px-3.5 py-2.5 rounded-xl font-bold hover:bg-nerveHover transition-colors">
+          В плейлист →
+        </a>
+      </div>
+    </section>
+
+    <!-- 6. БЛОК «В КАКОМ НАСТРОЕНИИ ЗАХОДИТ» (С КАДРАМИ МОТОЦИКЛ / ЛЕС / ВОДА) -->
+    <section class="mb-8">
+      <div class="mb-3">
+        <span class="font-mono text-[10px] uppercase tracking-widest opacity-60">Выбери своё состояние</span>
+        <h3 class="font-editorial text-2xl sm:text-3xl font-bold">В каком настроении заходит</h3>
+      </div>
+
+      <div class="space-y-3" id="mood-cards">
+        <!-- Карточка 1: Драйв / На максимум (Мотоцикл) -->
+        <div onclick="selectMood(0)" class="mood-card cursor-pointer rounded-2xl border border-current/20 p-3.5 transition-all hover:border-nerve">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono text-xs text-nerve font-bold">01</span>
+              <span class="font-semibold text-sm sm:text-base">Драйв / Включить на максимум</span>
+            </div>
+            <span class="font-mono text-xs text-nerve">+ открыть</span>
+          </div>
+          <div class="mood-quote hidden mt-3 pt-3 border-t border-current/10">
+            <div class="rounded-xl overflow-hidden mb-3 aspect-[4/3.6] bg-zinc-900">
+              <img 
+                src="https://i.postimg.cc/28zy0ZNB/Zq-j-er-Zxx1-SFkbo-Wmoaali-Ysf4Hq-ZT5-o-Qn-LX1Y8Ek-Ufln-N1Ry-AAtkx7Z00m-Pb-A4UQle-CP3B4rntpsv-IMWct.webp" 
+                loading="lazy"
+                alt="Anna Starness — Драйв и скорость"
+                class="w-full h-full object-cover object-top"
+              />
+            </div>
+            <blockquote class="font-editorial italic text-lg leading-snug mb-3">
+              «Когда внутри кипит злость и хочется выкрутить громкость до упора — не тормози»
+            </blockquote>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <button type="button" onclick="event.stopPropagation(); jumpToCue(2)" class="font-mono text-[11px] bg-nerve text-white px-3 py-1.5 rounded-lg">
+                Слушать драйв (2:10) ▶
+              </button>
+              <a href="https://music.yandex.ru/album/44275123" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="font-mono text-[11px] underline decoration-nerve">
+                Открыть в Яндекс Музыке ↗
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 2: Одиночество / Дистанция (Осенний лес) -->
+        <div onclick="selectMood(1)" class="mood-card cursor-pointer rounded-2xl border border-current/20 p-3.5 transition-all hover:border-nerve">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono text-xs text-nerve font-bold">02</span>
+              <span class="font-semibold text-sm sm:text-base">Одиночество / Любовь на дистанции</span>
+            </div>
+            <span class="font-mono text-xs text-nerve">+ открыть</span>
+          </div>
+          <div class="mood-quote hidden mt-3 pt-3 border-t border-current/10">
+            <div class="rounded-xl overflow-hidden mb-3 aspect-[4/3.6] bg-zinc-900">
+              <img 
+                src="https://i.postimg.cc/659qMvx2/forest.jpg" 
+                loading="lazy"
+                alt="Anna Starness — Одиночество и дистанция"
+                class="w-full h-full object-cover object-top"
+              />
+            </div>
+            <blockquote class="font-editorial italic text-lg leading-snug mb-3">
+              «Люби меня любую — даже когда между нами километры, тишина и холодный ветер»
+            </blockquote>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <button type="button" onclick="event.stopPropagation(); jumpToCue(0)" class="font-mono text-[11px] bg-nerve text-white px-3 py-1.5 rounded-lg">
+                Слушать начало (0:00) ▶
+              </button>
+              <button type="button" onclick="event.stopPropagation(); copyLyricQuote('«Люби меня любую» — Anna Starness')" class="font-mono text-[11px] underline decoration-nerve">
+                Скопировать цитату
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточка 3: Глубина / Кипяток (Вода) -->
+        <div onclick="selectMood(2)" class="mood-card cursor-pointer rounded-2xl border border-current/20 p-3.5 transition-all hover:border-nerve">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="font-mono text-xs text-nerve font-bold">03</span>
+              <span class="font-semibold text-sm sm:text-base">Глубина / Кипяток внутри</span>
+            </div>
+            <span class="font-mono text-xs text-nerve">+ открыть</span>
+          </div>
+          <div class="mood-quote hidden mt-3 pt-3 border-t border-current/10">
+            <div class="rounded-xl overflow-hidden mb-3 aspect-[4/3.6] bg-zinc-900">
+              <img 
+                src="https://i.postimg.cc/Hspn6y18/water.jpg" 
+                loading="lazy"
+                alt="Anna Starness — Глубина и кипяток"
+                class="w-full h-full object-cover object-top"
+              />
+            </div>
+            <blockquote class="font-editorial italic text-lg leading-snug mb-3">
+              «Разлилась кипятком от мыслей, которые слишком долго не помещались на бумаге»
+            </blockquote>
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <button type="button" onclick="event.stopPropagation(); jumpToCue(1)" class="font-mono text-[11px] bg-nerve text-white px-3 py-1.5 rounded-lg">
+                Слушать припев (0:42) ▶
+              </button>
+              <a href="https://band.link/gho4i" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="font-mono text-[11px] underline decoration-nerve">
+                Все стриминги ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. БЛОК СОХРАНЕНИЯ В МЕДИАТЕКУ (С ФОТО В ВОДЕ) -->
+    <section class="mb-8 rounded-2xl border border-current/20 overflow-hidden bg-current/[0.04]">
+      <div class="grid grid-cols-12 items-center">
+        <div class="col-span-5 h-full min-h-[175px] bg-zinc-900">
+          <img 
+            src="https://i.postimg.cc/Hspn6y18/water.jpg" 
+            loading="lazy"
+            alt="Anna Starness — Сохранить трек в медиатеку"
+            class="w-full h-full object-cover object-top"
+          />
+        </div>
+        <div class="col-span-7 p-4">
+          <span class="font-mono text-[10px] uppercase text-nerve font-bold block mb-1">Поддержать релиз</span>
+          <h3 class="font-editorial text-xl sm:text-2xl font-bold leading-tight mb-2">
+            Сохрани трек в медиатеку
+          </h3>
+          <p class="text-xs leading-relaxed opacity-85 mb-3">
+            Один лайк в Яндекс Музыке или VK помогает песне попасть в «Мою волну» и рекомендации.
+          </p>
+          <div class="flex items-center gap-2">
+            <button id="save-heart-btn" onclick="toggleFavoriteHint()" class="px-3 py-2 rounded-xl border border-current/25 font-mono text-xs font-bold flex items-center gap-1.5 hover:border-nerve transition-colors">
+              <span id="heart-icon">♡</span>
+              <span>Лайк поставлен</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. ПУТЬ И РИТМ + УДЕРЖАНИЕ АУДИТОРИИ В VK -->
+    <section class="rounded-2xl bg-ink text-paper p-5 border border-nerve/40 shadow-xl">
+      <div class="font-mono text-[10px] uppercase tracking-widest text-nerve mb-1">Петрозаводск • Барабаны и голос</div>
+      <h3 class="font-editorial text-2xl sm:text-3xl font-bold leading-tight mb-2">
+        Стихи на бумаге, палочки в руках и честный рок
+      </h3>
+      <p class="text-xs sm:text-sm text-paper/80 leading-relaxed mb-4">
+        Всё началось с мыслей, которые не давали покоя в тетради, продолжилось за ударной установкой и вылилось в треки без фальши. Подписывайся ВКонтакте, чтобы не пропустить новые синглы и живые видео с репетиций.
+      </p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <a href="https://vk.ru/annastarness" target="_blank" rel="noopener" 
+           class="flex items-center justify-center gap-2 bg-paper text-ink hover:bg-nerve hover:text-white font-semibold text-sm py-3.5 px-4 rounded-xl transition-colors">
+          <span>Страница ВКонтакте</span>
+          <span>↗</span>
+        </a>
+        <a href="https://music.yandex.ru/artist/24263620" target="_blank" rel="noopener" 
+           class="flex items-center justify-center gap-2 border border-paper/30 text-paper hover:border-nerve hover:text-nerve font-semibold text-sm py-3.5 px-4 rounded-xl transition-colors">
+          <span>Яндекс Музыка</span>
+          <span>↗</span>
+        </a>
+      </div>
+
+      <div class="ticket-divider h-3 my-4 text-paper"></div>
+
+      <footer class="flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] text-paper/60">
+        <span>© 2026 ANNA STARNESS</span>
+        <div class="flex gap-3">
+          <button type="button" onclick="toggleEpkModal(true)" class="hover:text-nerve underline">Пресс-кит (EPK)</button>
+          <a href="https://band.link/gho4i" target="_blank" rel="noopener" class="hover:text-nerve">BandLink</a>
+        </div>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- МОДАЛЬНОЕ ОКНО EPK (ДЛЯ СМИ, ПЛЕЙЛИСТОВ И ОРГАНИЗАТОРОВ) -->
+  <div id="epk-modal" class="fixed inset-0 z-50 hidden items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
+    <div class="bg-paper text-ink w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 border border-ink/20 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-ink/15 pb-3 mb-4">
+        <div>
+          <span class="font-mono text-[10px] uppercase text-nerve font-bold">Для редакторов плейлистов и СМИ</span>
+          <h4 class="font-editorial text-2xl font-bold">Anna Starness — EPK</h4>
+        </div>
+        <button onclick="toggleEpkModal(false)" class="w-8 h-8 rounded-lg bg-ink/10 flex items-center justify-center font-mono text-sm">✕</button>
+      </div>
+
+      <p class="text-xs leading-relaxed opacity-85 mb-4">
+        <strong>Anna Starness</strong> (Петрозаводск) — независимая рок-исполнительница, автор текстов и барабанщица. Релиз «Безупречная любовь» сочетает эмоциональный женский вокал, драматичную лирику и плотный альтернативный драйв.
+      </p>
+
+      <div class="space-y-2 font-mono text-xs mb-5">
+        <div class="flex justify-between p-2.5 rounded-lg bg-ink/[0.05]">
+          <span>Карточка релиза (Яндекс Музыка)</span>
+          <a href="https://music.yandex.ru/album/44275123" target="_blank" rel="noopener" class="text-nerve underline">Открыть ↗</a>
+        </div>
+        <div class="flex justify-between p-2.5 rounded-lg bg-ink/[0.05]">
+          <span>Смартлинк (BandLink)</span>
+          <a href="https://band.link/gho4i" target="_blank" rel="noopener" class="text-nerve underline">Открыть ↗</a>
+        </div>
+        <div class="flex justify-between p-2.5 rounded-lg bg-ink/[0.05]">
+          <span>Официальная страница ВК</span>
+          <a href="https://vk.ru/annastarness" target="_blank" rel="noopener" class="text-nerve underline">vk.ru/annastarness</a>
+        </div>
+      </div>
+
+      <button onclick="toggleEpkModal(false)" class="w-full py-3 rounded-xl bg-ink text-paper font-mono text-xs uppercase tracking-wider">
+        Закрыть
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /**
+     * ИНТЕРАКТИВНЫЙ САУНДЧЕК И ПЛЕЕР ДЛЯ ANNA STARNESS
+     */
+    const AUDIO_CONFIG = {
+      cuePoints: [
+        { time: 0,   label: '0:00 — Вступление / холодный нерв', freq: 110 },
+        { time: 42,  label: '0:42 — Припев «Безупречная любовь»', freq: 146.83 },
+        { time: 130, label: '2:10 — Финальный разрыв и барабаны', freq: 164.81 }
+      ]
+    };
+
+    let isPlaying = false;
+    let currentCueIndex = 1; // По умолчанию выбран припев (0:42)
+    let crossfadeValue = 15; // 0 = Акустика (#F2EFE9), 100 = Студия (#141414)
+    let audioCtx = null;
+    let synthInterval = null;
+    let progressTimer = null;
+    let simulatedSeconds = 42;
+
+    // Инициализация полосок эквалайзера
+    function initWaveform() {
+      const container = document.getElementById('waveform-bars');
+      const heights = [30, 55, 40, 80, 95, 60, 45, 90, 100, 70, 50, 85, 65, 40, 75, 95, 60, 35, 70, 50, 85, 45, 60, 30];
+      container.innerHTML = heights.map((h, idx) => `
+        <div class="eq-bar flex-1 rounded-full bg-nerve transition-opacity" 
+             style="height: ${h}%; animation-delay: ${(idx * 0.07).toFixed(2)}s; opacity: ${idx < 8 ? '1' : '0.45'}">
+        </div>
+      `).join('');
+    }
+
+    // Управление кроссфейдером (Акустика <-> Студия)
+    const crossfaderInput = document.getElementById('sound-crossfader');
+    crossfaderInput.addEventListener('input', (e) => {
+      setCrossfader(parseInt(e.target.value, 10));
+    });
+
+    function setCrossfader(val) {
+      crossfadeValue = val;
+      crossfaderInput.value = val;
+
+      const body = document.body;
+      const photo = document.getElementById('hero-photo');
+      const badge = document.getElementById('mode-badge');
+      const pill = document.getElementById('live-status-pill');
+
+      if (val >= 50) {
+        // Режим "Студия / Драйв": графит #141414 и насыщенный огненный цвет портрета
+        body.classList.add('studio-mode');
+        photo.classList.remove('grayscale', 'brightness-95');
+        photo.classList.add('saturate-125', 'contrast-125', 'scale-[1.02]');
+        badge.textContent = 'СТУДИЯ / ДРАЙВ';
+        pill.textContent = 'FULL BAND + DRUMS';
+      } else {
+        // Режим "Акустика / Демо": бумажный фон #F2EFE9 и приглушенный монохром
+        body.classList.remove('studio-mode');
+        photo.classList.add('grayscale', 'brightness-95');
+        photo.classList.remove('saturate-125', 'contrast-125', 'scale-[1.02]');
+        badge.textContent = 'АКУСТИКА / ДЕМО';
+        pill.textContent = 'RAW VOCAL + NERVE';
+      }
+    }
+
+    // Генератор атмосферного рок-рифа на Web Audio API
+    function playSynthPulse() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      const baseFreq = AUDIO_CONFIG.cuePoints[currentCueIndex].freq;
+      const isStudio = crossfadeValue >= 50;
+      const notes = [baseFreq, baseFreq, baseFreq * 1.2, baseFreq * 1.5, baseFreq * 1.33, baseFreq];
+      let step = 0;
+
+      clearInterval(synthInterval);
+      synthInterval = setInterval(() => {
+        if (!isPlaying) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = isStudio ? 'sawtooth' : 'triangle';
+        const noteFreq = notes[step % notes.length];
+        osc.frequency.setValueAtTime(noteFreq, now);
+
+        const peakGain = isStudio ? 0.09 : 0.06;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(peakGain, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0008, now + 0.28);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.3);
+        step++;
+      }, 310);
+    }
+
+    function toggleAudioPlayback() {
+      isPlaying = !isPlaying;
+      updatePlayerUI();
+
+      if (isPlaying) {
+        playSynthPulse();
+        startProgressClock();
+      } else {
+        clearInterval(synthInterval);
+        clearInterval(progressTimer);
+      }
+    }
+
+    function jumpToCue(index) {
+      currentCueIndex = index;
+      const cue = AUDIO_CONFIG.cuePoints[index];
+      simulatedSeconds = cue.time;
+
+      document.querySelectorAll('.cue-btn').forEach((btn, i) => {
+        if (i === index) {
+          btn.classList.add('border-nerve', 'bg-nerve/[0.08]');
+          btn.classList.remove('border-current/15');
+        } else {
+          btn.classList.remove('border-nerve', 'bg-nerve/[0.08]');
+          btn.classList.add('border-current/15');
+        }
+      });
+
+      document.getElementById('current-cue-label').textContent = cue.label;
+      updateTimerText();
+
+      if (!isPlaying) {
+        isPlaying = true;
+        updatePlayerUI();
+        startProgressClock();
+      }
+      playSynthPulse();
+    }
+
+    function updatePlayerUI() {
+      const playIcon = document.getElementById('icon-play');
+      const pauseIcon = document.getElementById('icon-pause');
+      const wave = document.getElementById('waveform-bars');
+
+      if (isPlaying) {
+        playIcon.classList.add('hidden');
+        pauseIcon.classList.remove('hidden');
+        wave.classList.remove('eq-paused');
+      } else {
+        playIcon.classList.remove('hidden');
+        pauseIcon.classList.add('hidden');
+        wave.classList.add('eq-paused');
+      }
+    }
+
+    function startProgressClock() {
+      clearInterval(progressTimer);
+      progressTimer = setInterval(() => {
+        if (!isPlaying) return;
+        simulatedSeconds = (simulatedSeconds + 1) % 194;
+        updateTimerText();
+      }, 1000);
+    }
+
+    function updateTimerText() {
+      const mins = String(Math.floor(simulatedSeconds / 60)).padStart(2, '0');
+      const secs = String(simulatedSeconds % 60).padStart(2, '0');
+      document.getElementById('timer-display').textContent = `${mins}:${secs} / 03:14`;
+    }
+
+    // Интерактивные карточки настроения
+    function selectMood(idx) {
+      const cards = document.querySelectorAll('.mood-card');
+      cards.forEach((card, i) => {
+        const quote = card.querySelector('.mood-quote');
+        if (i === idx) {
+          const isHidden = quote.classList.contains('hidden');
+          quote.classList.toggle('hidden', !isHidden);
+          card.classList.toggle('border-nerve', isHidden);
+          card.classList.toggle('bg-current/[0.04]', isHidden);
+        } else {
+          quote.classList.add('hidden');
+          card.classList.remove('border-nerve', 'bg-current/[0.04]');
+        }
+      });
+    }
+
+    // Микро-фидбек: сердечко поддержки
+    let isHearted = false;
+    function toggleFavoriteHint() {
+      isHearted = !isHearted;
+      const btn = document.getElementById('save-heart-btn');
+      const icon = document.getElementById('heart-icon');
+      if (isHearted) {
+        icon.textContent = '♥';
+        btn.classList.add('bg-nerve', 'text-white', 'border-nerve');
+        showToast('Спасибо! Теперь нажми ❤️ в Яндекс Музыке');
+      } else {
+        icon.textContent = '♡';
+        btn.classList.remove('bg-nerve', 'text-white', 'border-nerve');
+      }
+    }
+
+    function copyTextToClipboard(text, message) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast(message);
+      } catch (err) {
+        showToast('Не удалось скопировать');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function copySmartLink() {
+      copyTextToClipboard('https://band.link/gho4i', 'Смартлинк на релиз скопирован!');
+    }
+
+    function copyLyricQuote(quote) {
+      copyTextToClipboard(quote, 'Цитата скопирована — можно вставлять в сторис');
+    }
+
+    function trackStreamClick(platform) {
+      showToast(`Открываем ${platform}...`);
+    }
+
+    let toastTimeout = null;
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = text;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2800);
+    }
+
+    function toggleEpkModal(show) {
+      const modal = document.getElementById('epk-modal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initWaveform();
+      updateTimerText();
+    });
+  </script>
+</body>
+</html>
+```
